@@ -23,6 +23,7 @@ int Gerenciador::getMesDeAumento(){
     return mesDeAumento;
 }
 
+//metodo para alterar dados de um funcionario
 void Gerenciador::alteraFuncionario(int codigo){
     int a, cod;
     std::string nome, ddi, telefone, endereco, areaDeFormacao, formacaoAcademica, areaDeSupervisao;
@@ -74,6 +75,7 @@ void Gerenciador::alteraFuncionario(int codigo){
                     }
                     break;
 
+                    //diretor
                     case 1:
                         cout << "Qual atributo voce deseja alterar?\n\n 1- Codigo\n 2- Nome\n 3- Endereco\n 4- Telefone\n 5- Mes/Ano\n 6- Salario\n7- Area de supervisao\n8- Area de formacaoo\n" << endl;
                         cin >> a;
@@ -122,8 +124,9 @@ void Gerenciador::alteraFuncionario(int codigo){
                         }
                         break;
 
+                        //gerente
                         case 2:
-                            cout << "Qual atributo voce deseja alterar?\n\n1- Codigo\n2- Nome\n3- Endereço\n4- Telefone\n5- Mes/Ano\n6- Salario\n7- Area de supervisao\n" << endl;
+                            cout << "Qual atributo voce deseja alterar?\n\n1- Codigo\n2- Nome\n3- EndereÃ§o\n4- Telefone\n5- Mes/Ano\n6- Salario\n7- Area de supervisao\n" << endl;
                             cin >> a;
 
                             switch(a){
@@ -165,8 +168,9 @@ void Gerenciador::alteraFuncionario(int codigo){
                             }
                         break;
 
+                        //presidente
                         case 3:
-                            cout << "Qual atributo voce deseja alterar?\n\n1- Codigo\n2- Nome\n3- Endereço\n4- Telefone\n5- Mes/Ano\n6- Salario\n7- Area de formacao\n8- Formacao Academica\n" << endl;
+                            cout << "Qual atributo voce deseja alterar?\n\n1- Codigo\n2- Nome\n3- EndereÃ§o\n4- Telefone\n5- Mes/Ano\n6- Salario\n7- Area de formacao\n8- Formacao Academica\n" << endl;
                             cin >> a;
 
                             switch(a){
@@ -219,6 +223,7 @@ void Gerenciador::alteraFuncionario(int codigo){
     }
 }
 
+//Deletar Funcionarios
 void Gerenciador::deletaFuncionario(int codigo)
 {
     int Y;
@@ -233,15 +238,16 @@ void Gerenciador::deletaFuncionario(int codigo)
                 cout << "Funcionario de codigo " << codigo << " deletado." << endl;
                 delete(funcionarios[i]);
             }else {
-                cout << "Operaçao abortada." << endl;
+                cout << "OperaÃ§ao abortada." << endl;
                 break;
             }
         }
         if(i == funcionarios.max_size()){
-            cout << "Funcionário nao encontrado." << endl;
+            cout << "FuncionÃ¡rio nao encontrado." << endl;
         }
     }
 }
+
 //EXIBE FUNCIONARIO PELO CODIGO
 void Gerenciador::exibeFuncionario(int codigo){
     int M = 0;
@@ -254,10 +260,12 @@ void Gerenciador::exibeFuncionario(int codigo){
 
     }
     if(M == 0){
-        cout << "Funcionário nao encontrado." << endl;
+        cout << "FuncionÃ¡rio nao encontrado." << endl;
     }
 
 }
+
+//exibir todos os funcioarios
 void Gerenciador::exibeTodosFuncionarios()
 {
     for(int i = 0; i < funcionarios.size(); i++){
@@ -265,6 +273,7 @@ void Gerenciador::exibeTodosFuncionarios()
     }
 }
 
+//exibir um tipo especifico de funcionario
 void Gerenciador::exibeTipoFuncionario(int d){
     for(int i = 0; i < funcionarios.size(); i++){
         if(funcionarios[i]->getDesignacao() == d){
@@ -272,6 +281,8 @@ void Gerenciador::exibeTipoFuncionario(int d){
         }
     }
 }
+
+//aumentar o salario
 void Gerenciador::aumentaSalario()
 {
     int tipo;
@@ -303,6 +314,7 @@ void Gerenciador::aumentaSalario()
     cout << mesDeAumento;
 }
 
+//folha de pagamento
 void Gerenciador::setFolhaDePagamento(int mes){
     unsigned seed = time(0);
     unsigned seed2 = time(0);
@@ -319,15 +331,15 @@ void Gerenciador::setFolhaDePagamento(int mes){
     srand(seed);
     srand(seed2);
     for(int i = 0; i < funcionarios.size() ; i++){
-        horaExtra[i] = rand()%41;
-        diasTrabalhados[i] = rand()%21;
+        horaExtra[i] = rand()%41;   //numero aleatorio de horas extras trabalhadas
+        diasTrabalhados[i] = rand()%21;     //numero aleatorio de dias trabalhados
         if(diasTrabalhados[i] < 10){
             diasTrabalhados[i] += 10;
         }
         precoHora[i] = funcionarios[i]->getSalario()/160;
         precoHoraExtra[i] = precoHora[i]*2;
 
-        soma[i] = funcionarios[i]->getSalario() + (horaExtra[i] * precoHoraExtra[i]);
+        soma[i] = funcionarios[i]->getSalario() + (horaExtra[i] * precoHoraExtra[i]);   //salario total do funcionario, sem o desconto dos impostos
         //IMPOSTO DE RENDA
         if(funcionarios[i]->getSalario() > 1903.98 && funcionarios[i]->getSalario() <= 2826.65){
             descontos[i] = funcionarios[i]->getSalario()*0.075;
@@ -360,16 +372,18 @@ void Gerenciador::setFolhaDePagamento(int mes){
 
     }
     //escrevendo no arquivo
+
+    //folha de pagamento geral
     folha.open(z);
     for(int i = 0; i < funcionarios.size(); i++){
         folha << funcionarios[i]->getCodigo() << " - " << funcionarios[i]->getNome() << endl;
-        folha << "Salário bruto: R$" << funcionarios[i]->getSalario() << endl;
+        folha << "SalÃ¡rio bruto: R$" << funcionarios[i]->getSalario() << endl;
         folha << "Descontos: R$" << to_string(descontos[i]) << endl;
-        folha << "Salário líquido: R$" << to_string(soma[i]) << endl;
+        folha << "SalÃ¡rio lÃ­quido: R$" << to_string(soma[i]) << endl;
         folha << "Dias trabalhados: " << to_string(diasTrabalhados[i]) << endl;
         folha << "Horas extras trabalhadasa: " << to_string(horaExtra[i]) << endl << endl;
     }
-    folha << "Total do mês: R$" << gastosTotais;
+    folha << "Total do mÃªs: R$" << gastosTotais;
     folha.close();
     for(int i = 0; i < funcionarios.size(); i++){
         he.push_back(horaExtra[i]);
@@ -380,19 +394,21 @@ void Gerenciador::setFolhaDePagamento(int mes){
         string x = "FolhaFuncionario" + to_string(funcionarios[i]->getCodigo()) + "Mes" + to_string(mes) + ".txt";
         folhaFuncionario.open(x);
         folhaFuncionario << funcionarios[i]->getCodigo() << " - " << funcionarios[i]->getNome() << endl;
-        folhaFuncionario << "Salário bruto: R$" << funcionarios[i]->getSalario() << endl;
+        folhaFuncionario << "SalÃ¡rio bruto: R$" << funcionarios[i]->getSalario() << endl;
         folhaFuncionario << "Descontos: R$" << to_string(descontos[i]) << endl;
-        folhaFuncionario << "Salário líquido: R$" << to_string(soma[i]) << endl;
+        folhaFuncionario << "SalÃ¡rio lÃ­quido: R$" << to_string(soma[i]) << endl;
         folhaFuncionario << "Dias trabalhados: " << to_string(diasTrabalhados[i]) << endl;
         folhaFuncionario << "Horas extras trabalhadasa: " << to_string(horaExtra[i]) << endl << endl;
         folhaFuncionario.close();
     }
-    folhaFuncionario << "Total do mês: R$" << gastosTotais;
+    folhaFuncionario << "Total do mÃªs: R$" << gastosTotais;
     for(int i = 0; i < funcionarios.size(); i++){
         he.push_back(horaExtra[i]);
         dt.push_back(diasTrabalhados[i]);
     }
 }
+
+//buscar funcionario pelo cod
 void Gerenciador::buscaFuncionarioCodigo(int cod,int mes){
 
     for(int i = 0;i < funcionarios.size();i++){
@@ -410,6 +426,7 @@ void Gerenciador::buscaFuncionarioCodigo(int cod,int mes){
 
 }
 
+//buscar func por nome ou endereco
 void Gerenciador::buscaFuncionarioNomeEndereco(string BUSCA){
     int achou = 0;
 
@@ -424,11 +441,23 @@ void Gerenciador::buscaFuncionarioNomeEndereco(string BUSCA){
     }
 }
 
+//buscar por intervalo de tempo
 void Gerenciador::buscaIntervalo(int bmes, int bano, int bmes2, int bano2){
     for(int i = 0; i < funcionarios.size(); i++){
+
+        //if else mais estranho que ja fizemos
+        //apenas nÃ³s no dia que fizemos e Deus sabemos como funcionou
+
+        //comecar comparando ano do func com ano inicial digitado
         if(funcionarios[i]->getAno() == bano){
+
+            //comparar mes do func com mes inicial digitado
             if(funcionarios[i]->getMesI() >= bmes){
+
+                //comparar ano do func com ano max digitado
                 if(funcionarios[i]->getAno() == bano2){
+
+                    //comparar mes do func com mes max digitado
                     if(funcionarios[i]->getMesI() <= bmes2){
                         funcionarios[i]->showDados();
                         continue;
@@ -436,32 +465,45 @@ void Gerenciador::buscaIntervalo(int bmes, int bano, int bmes2, int bano2){
                         cout << "Nenhum funcionario encontrado." << endl;
                         continue;
                     }
+
+                //comparar ano do func com ano max digitado
                 }else if(funcionarios[i]->getAno() > bano2){
 
                     continue;
+
+                //comparar ano do func com ano max digitado
                 }else if(funcionarios[i]->getAno() < bano2){
                     funcionarios[i]->showDados();
-                    //cout << "error";
                     continue;
                 }
             }
+
+        //comparar ano do func com ano inicial digitado
         }else if(funcionarios[i]->getAno() < bano){
-            //cout << "Nenhum funcionario encontrado." << endl;
             continue;
+
+        //comparar ano do func com ano digitado
         }else if(funcionarios[i]->getAno() > bano){
+
+            //comparar ano do func com ano max digitado
             if(funcionarios[i]->getAno() == bano2){
+
+                //comparar mes do func com mes max digitado
                 if(funcionarios[i]->getMesI() <= bmes2){
                     funcionarios[i]->showDados();
-                    //cout << "error";
                     continue;
+
                 }else {
                     continue;
                     cout << "Nenhum funcionario encontrado." << endl;
                 }
+
+            //comparar ano do func com ano max digitado
             }else if(funcionarios[i]->getAno() < bano2){
                 funcionarios[i]->showDados();
-
                 continue;
+
+            //comparar ano do func com ano max digitado
             }else if(funcionarios[i]->getAno() > bano2){
                 continue;
                 cout << "Nenhum funcionario encontrado." << endl;
