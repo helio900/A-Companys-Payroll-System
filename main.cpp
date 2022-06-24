@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
+#include <fstream>
+#include <windows.h>
 
 #include "Funcionario.h"
 #include "Gerente.h"
@@ -8,13 +10,14 @@
 #include "Presidente.h"
 #include "Operador.h"
 #include "Gerenciador.h"
-#include "Folha.h"
+//#include "Folha.h"
+#include "CEP.h"
 
 using namespace std;
 
 int main()
 {
-    int codigo;
+    int codigo, codFoto;
     int busca;
     std::string nome;
     std::string endereco;
@@ -32,14 +35,20 @@ int main()
     string BUSCA;
     int option;
     int bmes, bano, bmes2, bano2;
-    Gerenciador g;
+    string miniCEP, url, cmd, cmdFoto;
+    int temPresidente = 0;
+    int foto;
+    int funExiste = 0;
 
+    Gerenciador g;
+    CEP c;
     Funcionario *f;
-    //Funcionario *a[4];
+
+    SetConsoleOutputCP(CP_UTF8);
 
     while(1){
 
-
+                //menu de opcoes
                 std::cout << endl << "----- Escolha uma opcao -----" << std::endl
                 << "01 - Cadastrar Funcionario" << std::endl
                 << "02 - Editar funcionario" << std::endl
@@ -53,34 +62,50 @@ int main()
                 << "10 - Exibir Folha Salarial Mensal" << std::endl
                 << "11 - Procurar funcionario pelo nome ou endereco" << std::endl
                 << "12 - Procurar funcionario por intervalo de tempo" << endl
+                << "13 - Cadastrar foto de perfil de um funcionario" << endl
                 << "00 - Sair\n" << std::endl;
 
                 std::cin >> i;
                 cout << endl;
 
                 switch(i){
+                    //criar funcionario
                     case 1:
                         cout << "Codigo: ";
                         cin >> codigo;
                         cin.ignore();
                         cout << "Nome: ";
                         getline(cin,nome);
-                        cout << "Endereco: ";
-                        getline(cin,endereco);
+
+                        cout << "CEP: ";
+                        getline(cin,miniCEP);
+                        url = "https://viacep.com.br/ws/" + miniCEP  + "/json/";
+                        cmd = "wget -qO cep.txt " + url;
+                        system(cmd.c_str());
+                        endereco = c.parseCep();
+
                         cout << "Telefone: ";
                         getline(cin,tel);
-                        cout << "Data de iniciacao (mês e ano):";
+                        cout << "Data de iniciacao (mÃªs e ano):";
                         cin >> mesI;
                         cin >> ano;
                         cout << "Designacao: ";
                         cin >> designacao;
+                        if(temPresidente == 0 && designacao == 3){
+                            temPresidente = 1;
+                        }else if(temPresidente == 1 && designacao == 3){
+                            cout << "Apenas um presidente permitido na empresa." << endl;
+                            break;
+                        }
                         cout << "Salario: ";
                         cin >> salario;
                         cin.ignore();
+
                         i++;
 
                         switch(designacao){
 
+                            //operador
                             case 0:
                                 f = new Operador();
                                 f->setDados(codigo,nome,endereco,tel,mesI,ano,designacao,salario);
@@ -101,7 +126,7 @@ int main()
 
                                 break;
 
-
+                            //diretor
                             case 1:
                                 f = new Diretor();
                                 f->setDados(codigo,nome,endereco,tel,mesI,ano,designacao,salario);
@@ -121,7 +146,7 @@ int main()
                                 }
                                 break;
 
-
+                            //gerente
                             case 2:
                                 f = new Gerente();
                                 f->setDados(codigo,nome,endereco,tel,mesI,ano,designacao,salario);
@@ -142,7 +167,7 @@ int main()
 
                                 break;
 
-
+                            //presidente
                             case 3:
                                 f = new Presidente();
                                 f->setDados(codigo,nome,endereco,tel,mesI,ano,designacao,salario);
@@ -164,32 +189,74 @@ int main()
                                 break;
 
                         }
+                        funExiste = 1;
                         break;
+
+                    //edicao de funcionario
                     case 2:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Digite o codigo do funcionario que voce deseja editar\n" << endl;
                         cin >> busca;
                         g.alteraFuncionario(busca);
+
                         break;
+
+                    //deletar funcionario
                     case 3:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Digite o codigo do funcionario que voce deseja deletar" << endl;
                         cin >> busca;
                         g.deletaFuncionario(busca);
+
                         break;
+
+                    //exibir func por codigo
                     case 4:
-                        cout << "Digite o codigo do funcionario que você deseja exibir" << endl;
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
+                        cout << "Digite o codigo do funcionario que vocÃª deseja exibir" << endl;
                         cin >> busca;
                         g.exibeFuncionario(busca);
+
                         break;
+
+                    //exibir todos os func
                     case 5:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Exibindo todos os funcionarios:\n" << endl;
                         g.exibeTodosFuncionarios();
+
                         break;
+
+                    //exibir func por tipo
                     case 6:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Digite o tipo de funcionario que voce deseja exibir: \n0 - Operario\n1 - Diretor\n2 - Gerente\n3 - Diretor\n" << endl;
                         cin >> busca;
                         g.exibeTipoFuncionario(busca);
+
                         break;
+
+                    //aumento
                     case 7:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Concedendo aumento a todos os funcionarios" << endl;
                         g.aumentaSalario();
                         mes = g.getMesDeAumento();
@@ -198,7 +265,13 @@ int main()
                             meses[mes-i] = 1;
                         }
                         break;
+
+                    //folha de pagamento
                     case 8:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Gerando folha de pagamento em arquivo" << endl;
                         cout << "Digite o mes da folha de pagamento" << endl;
                         cout << "*Se quiser a anual digite 12*" << endl;
@@ -230,8 +303,14 @@ int main()
                             }
                         }
                         break;
+
+                    //folha de pagamento por codigo e mes
                     case 9:
-                        cout << "Digite o codigo e o mês do funcionario cuja folha de pagamento voce deseja ver: ";
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
+                        cout << "Digite o codigo e o mÃªs do funcionario cuja folha de pagamento voce deseja ver: ";
                         int c,m;
                         cout << "Codigo: ";
                         cin >> c;
@@ -243,7 +322,12 @@ int main()
 
                         break;
 
+                    //folha de pagamento mensal
                     case 10:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Deseja abrir a folha de pagamento de qual mes?" << endl;
                         int M;
                         cin >> M;
@@ -254,20 +338,48 @@ int main()
 
                         break;
 
+                    //busca func por nome ou endereco
                     case 11:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
+                        cout << "Digite o nome ou endereco do funcionario: ";
                         cin.ignore();
                         getline(cin, BUSCA);
-
                         g.buscaFuncionarioNomeEndereco(BUSCA);
 
                         break;
 
+                    //busca func por intervalo de tempo
                     case 12:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
                         cout << "Digite o mes e ano inicial, depois o mes e ano final: ";
                         cin >> bmes >> bano >> bmes2 >> bano2;
-
                         g.buscaIntervalo(bmes, bano, bmes2, bano2);
 
+                        break;
+
+                    //foto do funcionario
+                    case 13:
+                        if(funExiste == 0){
+                            cout << "Nao foi criado nenhum funcionario." << endl;
+                            break;
+                        }
+                        cout << "Digite o codigo do funcionario da foto: ";
+                        cin >> codFoto;
+                        cout << "Pressione 1 para tirar a foto: ";
+                        cin >> foto;
+
+                        if(foto == 1){
+                            cmdFoto = "ffmpeg.exe -loglevel quiet -f vfwcap -y -i 0 -vframes 1 " + to_string(codFoto) + ".jpg";
+                            system(cmdFoto.c_str());
+                            cout << "Foto armazenada no sistema." << endl;
+                            break;
+                        }
                         break;
 
                     case 0:
